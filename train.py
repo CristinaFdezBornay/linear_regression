@@ -2,6 +2,7 @@
 try:
     import argparse
     import pandas as pd
+    import pickle
 except:
     print('[Import error] Please run <pip3 install -r requirements.txt>')
     exit()
@@ -15,8 +16,8 @@ def parse_arg():
 def read_csv(datafile):
     try:
         f = pd.read_csv(datafile)
-        km = f['km']
-        price = f['price']
+        km = f.get('km')
+        price = f.get('price')
         if len(km) == 0:
             km = []
         if len(price) == 0:
@@ -49,23 +50,28 @@ def calculate_loss(km, price, tetha0, tetha1):
 
 def main():
     try:
-        args = parse_arg()
-        km, price = read_csv(args.datafile)
-        tetha0 = 0
-        tetha1 = 0
-        mean_km = sum(km) / len(km)
-        mean_price = sum(price) / len(price)
+        # args = parse_arg()
+        # km, price = read_csv(args.datafile)
+        # tetha0 = 0
+        # tetha1 = 0
+        # mean_km = sum(km) / len(km)
+        # mean_price = sum(price) / len(price)
 
-        # accuracy = float('inf')
-        # while accuracy > 1:
+        # # accuracy = float('inf')
+        # # while accuracy > 1:
 
-        #     tmp_tetha0 =
-        # print(km)
-        # print(price)
-        print(calculate_loss(km, price, tetha0, tetha1))
+        # #     tmp_tetha0 =
+        # # print(km)
+        # # print(price)
+        # print(calculate_loss(km, price, tetha0, tetha1))
         # mileage = get_mileage()
         # price = calculate_price(mileage, tetha0, tetha1)
         # display_price(price, mileage, tetha0, tetha1)
+
+        tethas_dict = { 'tetha0': '345.2', 'tetha1': '24.5' }
+        outfile = open('tethas', 'wb')
+        pickle.dump(tethas_dict, outfile)
+        outfile.close()
     except NameError as e:
         print(e)
 
