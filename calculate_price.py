@@ -7,7 +7,7 @@ except:
     exit()
 
 def parse_arg():
-    parser = argparse.ArgumentParser(prog='calculate_price', usage='%(prog)s [-h] tetha.csv', description='Program to calculate the price of a car for a given tetha.')
+    parser = argparse.ArgumentParser(prog='calculate_price', usage='%(prog)s [-h] tetha.csv', description='Program to calculate the price of a car for a given milage.')
     parser.add_argument('tethas', help='the .csv file containing the tethas')
     args = parser.parse_args()
     return args
