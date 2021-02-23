@@ -4,5 +4,5 @@ __pycache__/
 # Environments
 venv/
 
-# Tethas
-tethas
+# Tethas & KM meand & KM std
+linear_regression_parameters
