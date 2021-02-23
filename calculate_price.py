@@ -4,53 +4,59 @@ try:
     import pandas as pd
     import pickle
 except:
-    print('[Import error] Please run <pip3 install -r requirements.txt>')
-    exit()
+    raise NameError('[Import error] Please run <pip3 install -r requirements.txt>')
 
-def get_tethas():
+def get_information():
     try:
-        infile = open('tethas', 'rb')
-        tethas_dict = pickle.load(infile)
+        infile = open('linear_regression_parameters', 'rb')
+        information = pickle.load(infile)
         infile.close()
-        tetha0 = float(tethas_dict['tetha0'])
-        tetha1 = float(tethas_dict['tetha1'])
-        return tetha0, tetha1
+        tetha0 = float(information['tetha0'])
+        tetha1 = float(information['tetha1'])
+        km_mean = float(information['km_mean'])
+        km_std = float(information['km_std'])
+        infile.close()
+        return tetha0, tetha1, km_mean, km_std
     except:
         raise NameError('\n[Read error]\nUnable to retrieve the tetha values.\n')
 
-def get_mileage():
+def get_km():
     try:
-        mileage = input('\nPlease introduce the mileage(km): ')
-        return float(mileage)
+        km = input('\nPlease introduce the mileage(km): ')
+        return float(km)
     except:
         raise NameError('\n[Input error]\nPlease introduce a valid number.\n')
 
-def calculate_price(mileage, tetha0, tetha1):
+def calculate_price(km, tetha0, tetha1, km_mean, km_std):
     try:
-        price = tetha0 + (tetha1 * mileage)
+        KM = (km - km_mean) / km_std
+        price = tetha0 + (tetha1 * KM)
         return price
     except:
         raise NameError('\n[Process error]\nThere has been an error while processing the information.\n')
 
-def display_price(price, mileage, tetha0, tetha1):
+def display_price(price, km, tetha0, tetha1):
     try:
-        print('\n=====================================================================\n')
-        print('\tThe estimated price for your vehicle is:  {:.2f}€'.format(price))
-        print('\n=====================================================================\n')
+        print('\n=======================================================================\n')
+        if price > 0:
+            print('\t🚗 The estimated price for your vehicle is:  {:.2f}€ 🚗'.format(price))
+        else:
+            print('\t😿 I am very sorry but your vehicle is worthless 😿')
+        print('\n=======================================================================\n')
         print()
         print('[ Info ]')
         print('Tetha 0 : {:.5f}'.format(tetha0).strip('0').strip('.'))
         print('Tetha 1 : {:.5f}'.format(tetha1).strip('0').strip('.'))
-        print('Mileage : {:.5f}'.format(mileage).strip('0').strip('.') + ' km')
+        print('Mileage : {:.5f}'.format(km).strip('0').strip('.') + ' km\n')
     except:
         raise NameError('\n[Display error]\nThere has been an error while displayind the information.\n')
 
 def main():
     try:
-        tetha0, tetha1 = get_tethas()
-        mileage = get_mileage()
-        price = calculate_price(mileage, tetha0, tetha1)
-        display_price(price, mileage, tetha0, tetha1)
+        tetha0, tetha1, km_mean, km_std = get_information()
+        km = get_km()
+        price = calculate_price(km, tetha0, tetha1, km_mean, km_std)
+        display_price(price, km, tetha0, tetha1)
     except NameError as e:
         print(e)
 
