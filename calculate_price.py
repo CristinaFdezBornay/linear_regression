@@ -6,15 +6,15 @@ try:
 except:
     raise NameError('[Import error] Please run <pip3 install -r requirements.txt>')
 
-def get_information():
+def get_parameters():
     try:
         infile = open('linear_regression_parameters', 'rb')
-        information = pickle.load(infile)
+        parameters = pickle.load(infile)
         infile.close()
-        tetha0 = float(information['tetha0'])
-        tetha1 = float(information['tetha1'])
-        km_mean = float(information['km_mean'])
-        km_std = float(information['km_std'])
+        tetha0 = float(parameters['tetha0'])
+        tetha1 = float(parameters['tetha1'])
+        km_mean = float(parameters['km_mean'])
+        km_std = float(parameters['km_std'])
         infile.close()
         return tetha0, tetha1, km_mean, km_std
     except:
@@ -22,8 +22,11 @@ def get_information():
 
 def get_km():
     try:
-        km = input('\nPlease introduce the mileage(km): ')
-        return float(km)
+        km = float(input('\nPlease introduce the mileage(km): '))
+        if km < 0:
+            print('\nThe mileage cannot be negavite.\n')
+            raise NameError('\n[Input error]\nPlease introduce a positive number.\n')
+        return km
     except:
         raise NameError('\n[Input error]\nPlease introduce a valid number.\n')
 
@@ -53,7 +56,7 @@ def display_price(price, km, tetha0, tetha1):
 
 def main():
     try:
-        tetha0, tetha1, km_mean, km_std = get_information()
+        tetha0, tetha1, km_mean, km_std = get_parameters()
         km = get_km()
         price = calculate_price(km, tetha0, tetha1, km_mean, km_std)
         display_price(price, km, tetha0, tetha1)
