@@ -9,15 +9,18 @@ except:
     raise NameError('[Import error] Please run <pip3 install -r requirements.txt>')
 
 def parse_arg():
-    parser = argparse.ArgumentParser(prog='train', usage='%(prog)s [-h][-v {1,2}][-lr][-it][-plt][-cst] datafile.csv', description='Program to train a model to calculate the price of a car for a given milage.')
-    parser.add_argument('datafile', help='.csv file containing the data to train the model')
-    parser.add_argument('-v', '--verbose', help='increase output verbosity', type=int, default=0)
-    parser.add_argument('-lr', '--learning_rate', help='[default = 0.01]', type=float, default=0.01)
-    parser.add_argument('-it', '--iterations', help='[default = 1000]', type=int, default=1000)
-    parser.add_argument('-plt', '--plot', help='dataset and linear regression', action='store_true')
-    parser.add_argument('-cst', '--cost', help='cost function', action='store_true')
-    args = parser.parse_args()
-    return args
+    try:
+        parser = argparse.ArgumentParser(prog='train', usage='%(prog)s [-h][-v {1,2}][-lr][-it][-plt][-cst] datafile.csv', description='Program to train a model to calculate the price of a car for a given milage.')
+        parser.add_argument('datafile', help='.csv file containing the data to train the model')
+        parser.add_argument('-v', '--verbose', help='increase output verbosity', type=int, default=0)
+        parser.add_argument('-lr', '--learning_rate', help='[default = 0.01]', type=float, default=0.01)
+        parser.add_argument('-it', '--iterations', help='[default = 1000]', type=int, default=1000)
+        parser.add_argument('-plt', '--plot', help='dataset and linear regression', action='store_true')
+        parser.add_argument('-cst', '--cost', help='cost function', action='store_true')
+        args = parser.parse_args()
+        return args
+    except:
+        raise NameError('\n[Input error]\nThere has been an error while parsing the arguments.\n')
 
 def read_csv(datafile):
     try:
@@ -93,22 +96,28 @@ def save_parameters(tetha0, tetha1, km, verbose):
         raise NameError('\n[Process error]\nThere has been an error while processing the information.\n')
 
 def plot_model(km, KM, price, tetha0, tetha1, learning_rate, number_iterations):
-    plt.scatter(km, price, color='blue')
-    estimated_price = tetha0 + (KM * tetha1)
-    plt.plot(km, estimated_price, color='red')
-    plt.xlabel('Mileage (km)')
-    plt.ylabel('Price (€)')
-    plt.legend(['LR model', 'Dataset'])
-    plt.suptitle('Linear regression model')
-    plt.title('Learning rate : {:.4f} || Number of iterations : {}'.format(learning_rate, number_iterations))
-    plt.show()
+    try:
+        plt.scatter(km, price, color='blue')
+        estimated_price = tetha0 + (KM * tetha1)
+        plt.plot(km, estimated_price, color='red')
+        plt.xlabel('Mileage (km)')
+        plt.ylabel('Price (€)')
+        plt.legend(['LR model', 'Dataset'])
+        plt.suptitle('Linear regression model')
+        plt.title('Learning rate : {:.4f} || Number of iterations : {}'.format(learning_rate, number_iterations))
+        plt.show()
+    except:
+        raise NameError('\n[Plot error]\nThere has been an error while plotting.\n')
 
 def plot_cost(costs, number_iterations):
-    plt.plot(range(number_iterations), costs)
-    plt.xlabel('Number of iterations')
-    plt.ylabel('Cost')
-    plt.title('Cost per iteration')
-    plt.show()
+    try:
+        plt.plot(range(number_iterations), costs)
+        plt.xlabel('Number of iterations')
+        plt.ylabel('Cost')
+        plt.title('Cost per iteration')
+        plt.show()
+    except:
+        raise NameError('\n[Plot error]\nThere has been an error while plotting.\n')
 
 def main():
     try:
