@@ -9,11 +9,13 @@ except:
     raise NameError('[Import error] Please run <pip3 install -r requirements.txt>')
 
 def parse_arg():
-    parser = argparse.ArgumentParser(prog='train', usage='%(prog)s [-h] [-v] [-lr] [-it] datafile.csv', description='Program to train a model to calculate the price of a car for a given milage.')
+    parser = argparse.ArgumentParser(prog='train', usage='%(prog)s [-h][-v {1,2}][-lr][-it][-plt][-cst] datafile.csv', description='Program to train a model to calculate the price of a car for a given milage.')
     parser.add_argument('datafile', help='.csv file containing the data to train the model')
-    parser.add_argument('-v', '--verbose', help='increase output verbosity', action='store_true')
+    parser.add_argument('-v', '--verbose', help='increase output verbosity', type=int, default=0)
     parser.add_argument('-lr', '--learning_rate', help='[default = 0.01]', type=float, default=0.01)
     parser.add_argument('-it', '--iterations', help='[default = 1000]', type=int, default=1000)
+    parser.add_argument('-plt', '--plot', help='dataset and linear regression', action='store_true')
+    parser.add_argument('-cst', '--cost', help='cost function', action='store_true')
     args = parser.parse_args()
     return args
 
@@ -33,16 +35,17 @@ def normalize(X):
     except:
         raise NameError('\n[Process error]\nThere has been an error while processing the information.\n')
 
-def train_model(KM, price, verbose, learning_rate, number_iterations):
+def train_model(KM, price, verbose, learning_rate, number_iterations, cost):
     try:
         m = KM.shape[0]
         tetha0 = 0
         tetha1 = 0
-        # cost = []  NOT DONE
-        if verbose:
+        costs = []
+        if verbose > 0:
             print('\n[ Trainig starting ]')
             print('Learning rate        : {:.4f}'.format(learning_rate).strip('0').strip('.'))
             print('Number of iterations : {}'.format(number_iterations))
+        if verbose > 1:
             print('\n[ Tethas per iteration ]')
         for i in range(number_iterations):
             estimated_price = tetha0 + (KM * tetha1)
@@ -51,45 +54,71 @@ def train_model(KM, price, verbose, learning_rate, number_iterations):
             tetha1_gradient = (1/m) * np.sum(loss * KM)
             tetha0 -= learning_rate * tetha0_gradient
             tetha1 -= learning_rate * tetha1_gradient
-            if verbose and i % 10 == 0:
+            if verbose > 1 and i % 10 == 0:
                 print('it: {}\t-> t0: {:.4f} || t1: {:.4f}'.format(i, tetha0, tetha1))
+            if cost:
+                costs.append(sum(loss ** 2) / m)
+
             i += 1
+        if cost:
+            plot_cost(costs, number_iterations)
         return tetha0, tetha1
     except:
         raise NameError('\n[Process error]\nThere has been an error while processing the information.\n')
 
-def save_information(tetha0, tetha1, km, verbose):
+def save_parameters(tetha0, tetha1, km, verbose):
     try:
         km_mean = km.mean()
         km_std = km.std()
-        information = {
+        parameters = {
             'tetha0': str(tetha0),
             'tetha1': str(tetha1),
             'km_mean': str(km_mean),
             'km_std': str(km_std)
         }
         outfile = open('linear_regression_parameters', 'wb')
-        pickle.dump(information, outfile)
+        pickle.dump(parameters, outfile)
         outfile.close()
-        if verbose:
+        if verbose > 0:
             print('\n[ Trainig finished ]')
-            print('The model has been trained and the parameters has been saved correctly.')
+            print('The model has been trained and the parameters have been saved correctly.')
+            print('Tetha 0 : {:.5f}'.format(tetha0).strip('0').strip('.'))
+            print('Tetha 1 : {:.5f}'.format(tetha1).strip('0').strip('.'))
+            print('Km mean : {:.5f}'.format(km_mean).strip('0').strip('.') + ' km')
+            print('Km std  : {:.5f}'.format(km_std).strip('0').strip('.'))
             print('\n[ Next step ]')
             print('\t<python calculate_price.py> to calculate the price of your vehicle according to the model.')
-            print('\t<python read_parameters.py> to see the parameters calculated after training the model.')
+            print('\t<python read_parameters.py> to see the parameters calculated after training the model.\n')
     except:
         raise NameError('\n[Process error]\nThere has been an error while processing the information.\n')
 
+def plot_model(km, KM, price, tetha0, tetha1, learning_rate, number_iterations):
+    plt.scatter(km, price, color='blue')
+    estimated_price = tetha0 + (KM * tetha1)
+    plt.plot(km, estimated_price, color='red')
+    plt.xlabel('Mileage (km)')
+    plt.ylabel('Price (€)')
+    plt.legend(['LR model', 'Dataset'])
+    plt.suptitle('Linear regression model')
+    plt.title('Learning rate : {:.4f} || Number of iterations : {}'.format(learning_rate, number_iterations))
+    plt.show()
+
+def plot_cost(costs, number_iterations):
+    plt.plot(range(number_iterations), costs)
+    plt.xlabel('Number of iterations')
+    plt.ylabel('Cost')
+    plt.title('Cost per iteration')
+    plt.show()
+
 def main():
     try:
-        verbose = False
         args = parse_arg()
-        if args.verbose:
-            verbose = True
         km, price = read_csv(args.datafile)
         KM = normalize(km)
-        tetha0, tetha1 = train_model(KM, price, verbose, args.learning_rate, args.iterations)
-        save_information(tetha0, tetha1, km, verbose)
+        tetha0, tetha1 = train_model(KM, price, args.verbose, args.learning_rate, args.iterations, args.cost)
+        save_parameters(tetha0, tetha1, km, args.verbose)
+        if (args.plot):
+            plot_model(km, KM, price, tetha0, tetha1, args.learning_rate, args.iterations)
     except NameError as e:
         print(e)
 
