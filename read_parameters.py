@@ -17,7 +17,7 @@ def get_information():
         infile.close()
         return tetha0, tetha1, km_mean, km_std
     except:
-        raise NameError('\n[Read error]\nUnable to retrieve the tetha values.\n')
+        raise NameError('\n[Read error]\nUnable to retrieve the information.\n')
 
 def display_information(tetha0, tetha1, km_mean, km_std):
     try:
