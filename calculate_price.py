@@ -1,7 +1,5 @@
 #/usr/bin/python3
 try:
-    import argparse
-    import pandas as pd
     import pickle
 except:
     raise NameError('[Import error] Please run <pip3 install -r requirements.txt>')
@@ -18,13 +16,13 @@ def get_parameters():
         infile.close()
         return tetha0, tetha1, km_mean, km_std
     except:
-        raise NameError('\n[Read error]\nUnable to retrieve the tetha values.\n')
+        return 0, 0, 0, 1
 
 def get_km():
     try:
         km = float(input('\nPlease introduce the mileage(km): '))
         if km < 0:
-            print('\nThe mileage cannot be negavite.\n')
+            print('\nThe mileage cannot be negative.\n')
             raise NameError('\n[Input error]\nPlease introduce a positive number.\n')
         return km
     except:
@@ -42,7 +40,10 @@ def display_price(price, km, tetha0, tetha1):
     try:
         print('\n=======================================================================\n')
         if price > 0:
-            print('\t🚗 The estimated price for your vehicle is:  {:.2f}€ 🚗'.format(price))
+            print('\t🚗 The estimated price of your vehicle is: {:.2f}€ 🚗'.format(price))
+        elif price == 0 and tetha0 == 0 and tetha1 == 0:
+            print('\t\t   Unable to calculate the price.')
+            print('\t\t  Run <python train.py dataset.csv>')
         else:
             print('\t😿 I am very sorry but your vehicle is worthless 😿')
         print('\n=======================================================================\n')
