@@ -10,7 +10,7 @@ except:
 
 def parse_arg():
     try:
-        parser = argparse.ArgumentParser(prog='train', usage='%(prog)s [-h][-v {1,2}][-lr][-it][-plt][-cst] datafile.csv', description='Program to train a model to calculate the price of a car for a given milage.')
+        parser = argparse.ArgumentParser(prog='train.py', usage='%(prog)s [-h][-v {1,2}][-lr][-it][-plt][-cst] datafile.csv', description='Program to train a model to calculate the price of a car for a given milage.')
         parser.add_argument('datafile', help='.csv file containing the data to train the model')
         parser.add_argument('-v', '--verbose', help='increase output verbosity', type=int, default=0)
         parser.add_argument('-lr', '--learning_rate', help='[default = 0.01]', type=float, default=0.01)
@@ -53,19 +53,14 @@ def train_model(KM, price, verbose, learning_rate, number_iterations, cost):
         for i in range(number_iterations):
             estimated_price = tetha0 + (KM * tetha1)
             loss = estimated_price - price
-            tetha0_gradient = (1/m) * np.sum(loss)
-            tetha1_gradient = (1/m) * np.sum(loss * KM)
-            tetha0 -= learning_rate * tetha0_gradient
-            tetha1 -= learning_rate * tetha1_gradient
+            tetha0 -= learning_rate * (1/m) * np.sum(loss)
+            tetha1 -= learning_rate * (1/m) * np.sum(loss * KM)
             if verbose > 1 and i % 10 == 0:
                 print('it: {}\t-> t0: {:.4f} || t1: {:.4f}'.format(i, tetha0, tetha1))
             if cost:
                 costs.append(sum(loss ** 2) / m)
-
             i += 1
-        if cost:
-            plot_cost(costs, number_iterations)
-        return tetha0, tetha1
+        return tetha0, tetha1, costs
     except:
         raise NameError('\n[Process error]\nThere has been an error while processing the information.\n')
 
@@ -104,7 +99,7 @@ def plot_model(km, KM, price, tetha0, tetha1, learning_rate, number_iterations):
         plt.ylabel('Price (€)')
         plt.legend(['LR model', 'Dataset'])
         plt.suptitle('Linear regression model')
-        plt.title('Learning rate : {:.4f} || Number of iterations : {}'.format(learning_rate, number_iterations))
+        plt.title('Learning rate : {:.3f} || Number of iterations : {}'.format(learning_rate, number_iterations))
         plt.show()
     except:
         raise NameError('\n[Plot error]\nThere has been an error while plotting.\n')
@@ -114,7 +109,8 @@ def plot_cost(costs, number_iterations):
         plt.plot(range(number_iterations), costs)
         plt.xlabel('Number of iterations')
         plt.ylabel('Cost')
-        plt.title('Cost per iteration')
+        plt.suptitle('Cost per iteration')
+        plt.title('Final cost: {:.2f}'.format(costs[len(costs) - 1]))
         plt.show()
     except:
         raise NameError('\n[Plot error]\nThere has been an error while plotting.\n')
@@ -124,10 +120,12 @@ def main():
         args = parse_arg()
         km, price = read_csv(args.datafile)
         KM = normalize(km)
-        tetha0, tetha1 = train_model(KM, price, args.verbose, args.learning_rate, args.iterations, args.cost)
+        tetha0, tetha1, costs = train_model(KM, price, args.verbose, args.learning_rate, args.iterations, args.cost)
         save_parameters(tetha0, tetha1, km, args.verbose)
-        if (args.plot):
+        if args.plot:
             plot_model(km, KM, price, tetha0, tetha1, args.learning_rate, args.iterations)
+        if args.cost:
+            plot_cost(costs, args.iterations)
     except NameError as e:
         print(e)
 
