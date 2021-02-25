@@ -1,11 +1,11 @@
 # WELCOME TO LINEAR REGRESSION
 
-### SUMMARY
+## SUMMARY
 42 project where a moldel to predict a vehicle's price is trained using a given dataset.
 
 The model is a linear regression trained following the descendent gradient algorithm.
 
-#### Used formulas
+### Used formulas
 
 The formula used to estimate the price of the vehicle is: `estimated_price = tetha0 + tetha1 * km`.
 
@@ -17,7 +17,7 @@ The cost is calculated as `cost = (1/m) * sum((estimated_price - price) ^ 2)`.
 
 Tetha0 and tetha1 are updated on each iteration.
 
-### HOW TO
+## HOW TO
 
 ### Set Up
 ```
@@ -61,7 +61,7 @@ All of them are optional.
 * -plt    -> plot dataset and linear regression
 * -v      -> increase output verbosity
 
-### PROCESS
+## PROCESS
 
 ### Calculate price
 
